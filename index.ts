@@ -34,7 +34,7 @@ type State = {
   keysHeld: Array<Key>
 }
 
-const jump = new Audio("jump.mp3")
+const jump = new Audio("https://github.com/alvaroc1/canvas-basic/blob/master/jump.mp3?raw=true")
 jump.load()
 
 const drawCloud = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
