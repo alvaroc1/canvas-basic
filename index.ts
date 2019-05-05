@@ -1,4 +1,5 @@
 import { runApp } from './app'
+import { drawCloud, drawCharacter } from './draw'
 
 type Key = "left" | "right" | "up" | "down"
 
@@ -36,15 +37,6 @@ type State = {
 
 const jump = new Audio("https://github.com/alvaroc1/canvas-basic/blob/master/jump.mp3?raw=true")
 jump.load()
-
-const drawCloud = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-  ctx.fillStyle = "white"
-  ctx.beginPath()
-  ctx.arc(x,      y, 20, 0, 2 * Math.PI)
-  ctx.arc(x + 30, y, 30, 0, 2 * Math.PI)
-  ctx.arc(x + 60, y, 20, 0, 2 * Math.PI)
-  ctx.fill()
-}
 
 const distinct = <T>(array: Array<T>): Array<T> => {
   return array.reduce(
@@ -138,8 +130,7 @@ runApp <State, Event>(
       ctx.fillRect(0, 250, 300, 50)
 
       // draw character
-      ctx.fillStyle = "blue"
-      ctx.fillRect(140, 220 - model.y, 20, 30)
+      drawCharacter(ctx, 140, model.y)
 
       // draw clouds
       drawCloud(ctx, -model.offset + 50, 50)
