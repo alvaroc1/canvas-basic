@@ -11,4 +11,19 @@ export const drawCloud = (ctx: CanvasRenderingContext2D, x: number, y: number) =
 export const drawCharacter = (ctx: CanvasRenderingContext2D, x: number, heightPos: number) => {
   ctx.fillStyle = "blue"
   ctx.fillRect(x, 220 - heightPos, 20, 30)
+  ctx.fillStyle = "tan"
+  ctx.beginPath()
+  ctx.arc(x + 10, 210 - heightPos, 10, 0, 2 * Math.PI)
+  ctx.fill()
+  ctx.strokeStyle = "black"
+  ctx.stroke()
+
+  drawFace(ctx, x, 210 - heightPos)
+}
+
+const drawFace = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
+  ctx.strokeStyle = "black"
+  ctx.moveTo(50, 50)
+  ctx.quadraticCurveTo(100, 0, 100, 50)
+  ctx.stroke()
 }

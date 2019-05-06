@@ -129,13 +129,13 @@ runApp <State, Event>(
       ctx.fillStyle = "green"
       ctx.fillRect(0, 250, 300, 50)
 
-      // draw character
-      drawCharacter(ctx, 140, model.y)
 
       // draw clouds
       drawCloud(ctx, -model.offset + 50, 50)
       drawCloud(ctx, -model.offset + 180, 70)
 
+      // draw character
+      drawCharacter(ctx, 140, model.y)
 
       drawCloud(ctx, -model.offset + 50 + 400, 50)
       drawCloud(ctx, -model.offset + 180 + 400, 70)
