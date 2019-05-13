@@ -1,4 +1,4 @@
-import { runApp } from './app'
+import { runApp, Subscription } from './app'
 import { drawCloud, drawCharacter } from './draw'
 
 type Key = "left" | "right" | "up" | "down"
@@ -44,6 +44,10 @@ const distinct = <T>(array: Array<T>): Array<T> => {
     []
   )
 }
+
+const subscriptions: Array<Subscription<Event>> = [
+
+]
 
 runApp <State, Event>(
   "game",
@@ -145,7 +149,9 @@ runApp <State, Event>(
 
       ctx.fillText("ySpeed: " + model.yspeed, 30, 295)
     },
-
+    
+    subscriptions: subscriptions
+    /*
     onKeyDown: event => {
       const k = keyMap[event.keyCode]
       return (k ? Event.keyDown(k) : null)
@@ -155,5 +161,6 @@ runApp <State, Event>(
       const k = keyMap[event.keyCode]
       return (k ? Event.keyUp(k) : null)
     },
+    */
   }
 )

@@ -1,13 +1,30 @@
 
+namespace AnimationFrame {
+
+}
+
+class KeyboardSubscription<T> {
+  constructor (readonly fn: (ev: KeyboardEvent) => T) {}
+}
+export type Subscription<T> = KeyboardSubscription<T>
+
+export namespace Subscription {
+  const keyDown = <T>(fn: (ev: KeyboardEvent) => T): Subscription<T> =>
+    new KeyboardSubscription(fn)
+}
+
 type App<Model, Event> = {
   initial: Model,
   update: (_:Model, ev: Event) => Model,
   tick: (_:Model, delta: number) => Model,
   view: (_:Model, ctx: CanvasRenderingContext2D) => void,
+  subscriptions: (_:Model) => Array<Subscription<Event>>
+  /*
   onClick? : (ev: MouseEvent) => Event | null,
   onKeyDown? : (ev: KeyboardEvent) => Event | null,
   onKeyUp? : (ev: KeyboardEvent) => Event | null,
   onKeyPress? : (ev: KeyboardEvent) => Event | null
+  */
 }
 
 export const runApp = <Model, Event> (
