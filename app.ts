@@ -1,7 +1,4 @@
 
-namespace AnimationFrame {
-
-}
 
 class KeyboardSubscription<T> {
   constructor (readonly fn: (ev: KeyboardEvent) => T) {}
@@ -9,7 +6,7 @@ class KeyboardSubscription<T> {
 export type Subscription<T> = KeyboardSubscription<T>
 
 export namespace Subscription {
-  const keyDown = <T>(fn: (ev: KeyboardEvent) => T): Subscription<T> =>
+  export const keyDown = <T>(fn: (ev: KeyboardEvent) => T): Subscription<T> =>
     new KeyboardSubscription(fn)
 }
 

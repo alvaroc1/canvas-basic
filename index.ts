@@ -45,8 +45,8 @@ const distinct = <T>(array: Array<T>): Array<T> => {
   )
 }
 
-const subscriptions: Array<Subscription<Event>> = [
-
+const subscriptions = (_: State): Array<Subscription<Event>> => [
+  Subscription.keyDown(event => "goright")
 ]
 
 runApp <State, Event>(
