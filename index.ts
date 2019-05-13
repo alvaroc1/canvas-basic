@@ -46,7 +46,14 @@ const distinct = <T>(array: Array<T>): Array<T> => {
 }
 
 const subscriptions = (_: State): Array<Subscription<Event>> => [
-  Subscription.keyDown(event => "goright")
+  Subscription.keyDown(event => {
+    const k = keyMap[event.keyCode]
+    return Event.keyUp(k)
+  }),
+  Subscription.keyUp(event => {
+    const k = keyMap[event.keyCode]
+    return Event.keyUp(k)
+  })
 ]
 
 runApp <State, Event>(

@@ -6,8 +6,13 @@ class KeyboardSubscription<T> {
 export type Subscription<T> = KeyboardSubscription<T>
 
 export namespace Subscription {
+
   export const keyDown = <T>(fn: (ev: KeyboardEvent) => T): Subscription<T> =>
     new KeyboardSubscription(fn)
+
+  export const keyUp = <T>(fn: (ev: KeyboardEvent) => T): Subscription<T> =>
+    new KeyboardSubscription(fn)
+
 }
 
 type App<Model, Event> = {
@@ -38,6 +43,7 @@ export const runApp = <Model, Event> (
   let currentModel = app.initial
   let queuedEvents: Event[] = []
   
+  /*
   if (app.onClick) {
     canvas.addEventListener("click", ev => {
       queuedEvents.push(app.onClick(ev))
@@ -65,6 +71,7 @@ export const runApp = <Model, Event> (
       if (x) queuedEvents.push(x)
     })
   }
+  */
 
   const draw = (_: number) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
