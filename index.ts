@@ -46,14 +46,8 @@ const distinct = <T>(array: Array<T>): Array<T> => {
 }
 
 const subscriptions = (_: State): Array<Subscription<Event>> => [
-  Subscription.keyDown(event => {
-    const k = keyMap[event.keyCode]
-    return Event.keyUp(k)
-  }),
-  Subscription.keyUp(event => {
-    const k = keyMap[event.keyCode]
-    return Event.keyUp(k)
-  })
+  Subscription.keyDown.map(ev => keyMap[ev.keyCode]).map(Event.keyDown),
+  Subscription.keyUp.map(ev => keyMap[ev.keyCode]).map(Event.keyUp)
 ]
 
 runApp <State, Event>(
@@ -112,7 +106,6 @@ runApp <State, Event>(
         console.log("play")
         jump.play().catch(e => console.log(e.getMessage()))
 
-        console.log(jump)
         return {
           ...model,
           yspeed: 12
@@ -158,16 +151,5 @@ runApp <State, Event>(
     },
     
     subscriptions: subscriptions
-    /*
-    onKeyDown: event => {
-      const k = keyMap[event.keyCode]
-      return (k ? Event.keyDown(k) : null)
-    },
-
-    onKeyUp: event => {
-      const k = keyMap[event.keyCode]
-      return (k ? Event.keyUp(k) : null)
-    },
-    */
   }
 )

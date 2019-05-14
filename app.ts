@@ -1,17 +1,40 @@
 
-
+/*
+type KeyboardSubscription<T> = {
+  "type": "keyboard",
+  "event": "keyup"|"keydown"|"keypress",
+  "callback": (ev: KeyboardEvent) => T
+}
+*/
 class KeyboardSubscription<T> {
-  constructor (readonly fn: (ev: KeyboardEvent) => T) {}
+  readonly type: "keyboard" = "keyboard"
+  constructor (
+    readonly event: "keyup"|"keydown"|"keypress",
+    readonly callback: (ev: KeyboardEvent) => T
+  ) {}
+
+  map = <X>(fn: (v: T) => X) => new KeyboardSubscription(
+    this.event,
+    ev => {
+      const x = this.callback(ev)
+      return x !== null ? fn(x) : null
+    }
+  )
+  filter = (fn: (v: T) => Boolean) => new KeyboardSubscription(
+    this.event,
+    ev => {
+      const x = this.callback(ev)
+      return fn(x) ? x : null
+    }
+  )
 }
 export type Subscription<T> = KeyboardSubscription<T>
 
 export namespace Subscription {
 
-  export const keyDown = <T>(fn: (ev: KeyboardEvent) => T): Subscription<T> =>
-    new KeyboardSubscription(fn)
+  export const keyDown = new KeyboardSubscription("keydown", ev => ev)
 
-  export const keyUp = <T>(fn: (ev: KeyboardEvent) => T): Subscription<T> =>
-    new KeyboardSubscription(fn)
+  export const keyUp = new KeyboardSubscription("keyup", ev => ev)
 
 }
 
@@ -21,12 +44,6 @@ type App<Model, Event> = {
   tick: (_:Model, delta: number) => Model,
   view: (_:Model, ctx: CanvasRenderingContext2D) => void,
   subscriptions: (_:Model) => Array<Subscription<Event>>
-  /*
-  onClick? : (ev: MouseEvent) => Event | null,
-  onKeyDown? : (ev: KeyboardEvent) => Event | null,
-  onKeyUp? : (ev: KeyboardEvent) => Event | null,
-  onKeyPress? : (ev: KeyboardEvent) => Event | null
-  */
 }
 
 export const runApp = <Model, Event> (
@@ -42,36 +59,24 @@ export const runApp = <Model, Event> (
   let lastRender = start
   let currentModel = app.initial
   let queuedEvents: Event[] = []
-  
-  /*
-  if (app.onClick) {
-    canvas.addEventListener("click", ev => {
-      queuedEvents.push(app.onClick(ev))
-    })
-  }
-  if (app.onKeyDown) {
-    canvas.addEventListener("keydown", ev => {
-      if (!ev.repeat) {
-        const x = app.onKeyDown(ev)
-        if (x) queuedEvents.push(x)
+
+  let subscriptions = app.subscriptions(app.initial)
+  canvas.addEventListener("keydown", ev => {
+    subscriptions.map(s => {
+      if (s.type === "keyboard" && s.event === "keydown") {
+        const x = s.callback(ev)
+        if (x !== null) queuedEvents.push(s.callback(ev))
       }
     })
-  }
-  if (app.onKeyUp) {
-    canvas.addEventListener("keyup", ev => {
-      if (!ev.repeat) {
-        const x = app.onKeyUp(ev)
-        if (x) queuedEvents.push(x)
+  })
+  canvas.addEventListener("keyup", ev => {
+    subscriptions.map(s => {
+      if (s.type === "keyboard" && s.event === "keyup") {
+        const x = s.callback(ev)
+        if (x !== null) queuedEvents.push(x)
       }
     })
-  }
-  if (app.onKeyPress) {
-    canvas.addEventListener("keypress", ev => {
-      const x = app.onKeyPress(ev)
-      if (x) queuedEvents.push(x)
-    })
-  }
-  */
+  })
 
   const draw = (_: number) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -82,7 +87,7 @@ export const runApp = <Model, Event> (
     }
 
     currentModel = app.tick(currentModel, performance.now() - lastRender)
-    
+    subscriptions = app.subscriptions(currentModel)
     app.view(currentModel, ctx)
     lastRender = performance.now()
   }
