@@ -1,5 +1,4 @@
 
-
 class KeyboardSubscription<T> {
   readonly type: "keyboard" = "keyboard"
   constructor (
