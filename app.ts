@@ -1,11 +1,5 @@
 
-/*
-type KeyboardSubscription<T> = {
-  "type": "keyboard",
-  "event": "keyup"|"keydown"|"keypress",
-  "callback": (ev: KeyboardEvent) => T
-}
-*/
+
 class KeyboardSubscription<T> {
   readonly type: "keyboard" = "keyboard"
   constructor (
@@ -20,7 +14,7 @@ class KeyboardSubscription<T> {
       return x !== null ? fn(x) : null
     }
   )
-  filter = (fn: (v: T) => Boolean) => new KeyboardSubscription(
+  filter = (fn: (v: T) => Boolean) => new KeyboardSubscription<T>(
     this.event,
     ev => {
       const x = this.callback(ev)
@@ -28,13 +22,31 @@ class KeyboardSubscription<T> {
     }
   )
 }
-export type Subscription<T> = KeyboardSubscription<T>
+
+class AnimationSubscription<T> {
+  readonly type: "animation" = "animation"
+  constructor (
+    readonly callback: (ev: DOMHighResTimeStamp) => T
+  ) {}
+
+  map = <X>(fn: (v: T) => X) => new AnimationSubscription(
+    ev => {
+      const x = this.callback(ev)
+      return x !== null ? fn(x) : null
+    }
+  )
+}
+
+export type Subscription<T> = KeyboardSubscription<T> | AnimationSubscription<T>
+
 
 export namespace Subscription {
 
   export const keyDown = new KeyboardSubscription("keydown", ev => ev)
 
   export const keyUp = new KeyboardSubscription("keyup", ev => ev)
+
+  export const animationFrame = new AnimationSubscription(ev => ev)
 
 }
 
@@ -72,6 +84,14 @@ export const runApp = <Model, Event> (
   canvas.addEventListener("keyup", ev => {
     subscriptions.map(s => {
       if (s.type === "keyboard" && s.event === "keyup") {
+        const x = s.callback(ev)
+        if (x !== null) queuedEvents.push(x)
+      }
+    })
+  })
+  window.requestAnimationFrame(ev => {
+    subscriptions.map(s => {
+      if (s.type === "animation") {
         const x = s.callback(ev)
         if (x !== null) queuedEvents.push(x)
       }

@@ -18,14 +18,20 @@ const keyMap: {[k: number]: Key} = {
 namespace Event {
   export const keyUp = (k: Key): Event => ({"type": "keyup", key: k})
   export const keyDown = (k: Key): Event => ({"type": "keydown", key: k})
+  export const tick = (ts: Number): Event => ({type: "tick", delta: ts})
 }
 
 type KeyDown = {
-  "type": "keydown",
+  type: "keydown",
   key: Key
 }
 
-type Event = KeyUp | KeyDown
+type Tick = {
+  type: "tick"
+  delta: Number
+}
+
+type Event = KeyUp | KeyDown | Tick
 
 type State = {
   offset: number,
@@ -47,7 +53,8 @@ const distinct = <T>(array: Array<T>): Array<T> => {
 
 const subscriptions = (_: State): Array<Subscription<Event>> => [
   Subscription.keyDown.map(ev => keyMap[ev.keyCode]).map(Event.keyDown),
-  Subscription.keyUp.map(ev => keyMap[ev.keyCode]).map(Event.keyUp)
+  Subscription.keyUp.map(ev => keyMap[ev.keyCode]).map(Event.keyUp),
+  Subscription.animationFrame.map(ev => Event.tick(ev))
 ]
 
 runApp <State, Event>(
@@ -102,6 +109,7 @@ runApp <State, Event>(
     },
 
     update: (model, event) => {
+      console.log(event)
       if (event.type == "keydown" && event.key == "up") {
         console.log("play")
         jump.play().catch(e => console.log(e.getMessage()))
