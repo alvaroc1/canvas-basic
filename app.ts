@@ -65,6 +65,24 @@ export const runApp = <Model, Event> (
 ) => {
   const [canvas, ctx] = setupCanvas("game", 300, 300)
 
+  let currentModel = app.initial
+  let queuedEvents: Event[] = []
+
+  const drawFrame = () => {
+    // perform updates
+    while (queuedEvents.length > 0) {
+      let ev = queuedEvents.pop()
+      currentModel = app.update(currentModel, ev)
+    }
+
+    // draw
+    app.view(currentModel, ctx)
+
+    // schedule next draw
+    window.requestAnimationFrame(drawFrame)
+  }
+  window.requestAnimationFrame(drawFrame)
+  /*
   const start = performance.now()
   app.view(app.initial, ctx)
   let lastRender = start
@@ -88,16 +106,16 @@ export const runApp = <Model, Event> (
       }
     })
   })
-  window.requestAnimationFrame(ev => {
+
+  const draw = (ts: number) => {
+    // schedule animations
     subscriptions.map(s => {
       if (s.type === "animation") {
-        const x = s.callback(ev)
+        const x = s.callback(ts)
         if (x !== null) queuedEvents.push(x)
       }
     })
-  })
 
-  const draw = (_: number) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     while (queuedEvents.length > 0) {
@@ -112,6 +130,7 @@ export const runApp = <Model, Event> (
   }
 
   loop(draw)
+  */
 }
 
 export default runApp
