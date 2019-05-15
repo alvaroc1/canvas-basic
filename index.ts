@@ -2,24 +2,29 @@ import { runApp, Subscription } from './app'
 
 type Event = "tick"
 
-const update = (model: boolean, ev: "tick") => {
-  return model
+const update = (model: number, ev: "tick") => {
+  return model + 1
 }
 
-const view = (model: boolean, ctx: CanvasRenderingContext2D): void => {
-  ctx.fillRect(0, 0, 20, 20)
+const view = (model: number, ctx: CanvasRenderingContext2D): void => {
+  ctx.fillRect(model, 0, 20, 20)
 }
 
-const subscriptions = (model: boolean): Array<Subscription<Event>> => []
+const subscriptions = (model: number): Array<Subscription<Event>> => [
+  Subscription.keyUp.map<"tick">(_ => "tick"),
+  Subscription.animationFrame.map<"tick">(_ => "tick")
+]
 
-runApp <boolean,Event>(
+const initial = 4
+
+runApp <number,Event>(
   "game",
   300,
   300,
   {
-    initial: true,
+    initial: initial,
     update: update,
-    tick: (x, v) => true,
+    tick: (x, v) => x,
     view: view,
     subscriptions: subscriptions
   }

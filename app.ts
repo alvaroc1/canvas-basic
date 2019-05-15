@@ -67,8 +67,26 @@ export const runApp = <Model, Event> (
 
   let currentModel = app.initial
   let queuedEvents: Event[] = []
+  let subscriptions = app.subscriptions(app.initial)
+
+  canvas.addEventListener("keyup", ev => {
+    subscriptions.map(s => {
+      if (s.type === "keyboard" && s.event === "keyup") {
+        const x = s.callback(ev)
+        if (x !== null) queuedEvents.push(x)
+      }
+    })
+  })
 
   const drawFrame = () => {
+    // update subscriptions
+    subscriptions = app.subscriptions(currentModel)
+
+    // enqueue animation frame events
+    subscriptions.forEach(s => {
+      if (s.type === "animation") queuedEvents.push(s.callback(0))
+    })
+
     // perform updates
     while (queuedEvents.length > 0) {
       let ev = queuedEvents.pop()
